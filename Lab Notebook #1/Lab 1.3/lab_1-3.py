@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 s = requests.session()
 
-site = "acec1f2a1fd1436b80d287e900ec0061.web-security-academy.net"
+site = "ac261f351f9ea53a80647e2d00730015.web-security-academy.net"
 login_url = f'''https://{site}/login'''
 
 username_list = open("Authentication-lab-usernames.txt", "r").readlines()
