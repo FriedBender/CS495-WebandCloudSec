@@ -133,8 +133,7 @@ def binary_search(url):
 
 # To clean things up
 if __name__ == "__main__":
-    #site = sys.argv[1]
-    site = 'https://acf31f2a1e48e799800b8d85009f00b1.web-security-academy.net/'
+    site = sys.argv[1]
     if 'https://' in site:
         site = site.rstrip('/').lstrip('https://')
 
