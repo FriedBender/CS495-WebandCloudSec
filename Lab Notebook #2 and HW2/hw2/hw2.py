@@ -134,7 +134,7 @@ def binary_search(url):
 # To clean things up
 if __name__ == "__main__":
     #site = sys.argv[1]
-    site = 'https://ac1f1fc01e512a2d805d2292000f004f.web-security-academy.net/'
+    site = 'https://acf31f2a1e48e799800b8d85009f00b1.web-security-academy.net/'
     if 'https://' in site:
         site = site.rstrip('/').lstrip('https://')
 
@@ -146,4 +146,4 @@ if __name__ == "__main__":
     admin_password = binary_search(url)
     #print(f"Final password is: {admin_password}\n")
 
-    print(f"\nControl password: {control_password}\nMy Attempt: {admin_password}")
+    print(f"\nMy Attempt: {admin_password}")
