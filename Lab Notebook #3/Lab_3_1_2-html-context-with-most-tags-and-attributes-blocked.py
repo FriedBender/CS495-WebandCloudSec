@@ -22,5 +22,6 @@ for attribute in attributes:
     resp = s.get(search_url)
     if resp.status_code == 200:
         print(f'Success: {search_term} gives code {resp.status_code}')
+        resp 
     else:
         print(f'Error: {search_term} gives response: {resp.text}')
