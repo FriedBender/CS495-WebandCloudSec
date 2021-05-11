@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests as s
 
-site = 'ac401f7f1e329597801c1e87004b001e.web-security-academy.net'
+site = 'acc21fb81eee6f64809a97ca00a10065.web-security-academy.net'
 
 # Use this to search for in the web page
 def try_search(search_term):
